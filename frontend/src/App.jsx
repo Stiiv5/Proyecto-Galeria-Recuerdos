@@ -12,7 +12,7 @@ function App(){
   })
 
   const traerDatos = async () => {
-    const respuesta = await fetch('http://127.0.0.1:8000/recuerdos')
+    const respuesta = await fetch('https://api-recuerdos-nullvoice.onrender.com/recuerdos')
     const datos = await respuesta.json()
     setRecuerdos(datos)
   }
@@ -21,28 +21,17 @@ function App(){
     traerDatos()
   }, [])
 
-  // const guardar = async (e) => {
-  //   e.preventDefault(); // Evita que la página se recargue
-  //   await fetch('http://127.0.0.1:8000/recuerdos', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify(nuevoRecuerdo)
-  //   })
-  //   setNuevoRecuerdo({ titulo: '', desc: '', palabra: '' }) // Limpiar formulario
-  //   traerDatos() // Recargar la lista automáticamente
-  // }
 
   const borrarRecuerdo = async (id) => {
-    // Preguntamos para evitar borrar por accidente
     if (!window.confirm("¿Estás seguro de que quieres borrar este recuerdo?")) return;
 
     try {
-        const respuesta = await fetch(`http://127.0.0.1:8000/recuerdos/${id}`, {
+       
+        const respuesta = await fetch(`https://api-recuerdos-nullvoice.onrender.com/recuerdos/${id}`, {
             method: 'DELETE',
         });
 
         if (respuesta.ok) {
-            // Refrescamos la lista automáticamente
             traerDatos(); 
         } else {
             alert("Error al intentar borrar el recuerdo");
@@ -68,9 +57,9 @@ function App(){
     formData.append('foto', archivo); 
 
     try {
-        const respuesta = await fetch('http://127.0.0.1:8000/recuerdos-con-foto', {
+        const respuesta = await fetch('https://api-recuerdos-nullvoice.onrender.com/recuerdos-con-foto', {
             method: 'POST',
-            body: formData, // ¡OJO! No pongas headers de JSON aquí, el navegador lo hace solo para archivos
+            body: formData,
         });
 
         if (respuesta.ok) {
@@ -135,7 +124,7 @@ function App(){
         <div key={index} className="group bg-white rounded-4xl overflow-hidden shadow-xl hover:shadow-pink-200 transition-all duration-500 hover:-translate-y-2 border border-pink-50">
           <div className="relative h-72 overflow-hidden">
             <img 
-              src={`http://127.0.0.1:8000/${item.ruta_foto}`} 
+              src={`https://api-recuerdos-nullvoice.onrender.com/${item.ruta_foto}`} 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               alt={item.titulo}
             />
