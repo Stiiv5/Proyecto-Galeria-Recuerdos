@@ -102,7 +102,7 @@ function App(){
         />
       </div>
 
-      <button type="submit" className="w-full bg-[#473c3c] text-white font-black py-4 rounded-2xl hover:bg-[#ff4da6] transform hover:-translate-y-1 transition-all shadow-lg shadow-pink-200">
+      <button type="submit" className="w-full bg-[#514545] text-white font-black py-4 rounded-2xl hover:bg-[#ff4da6] transform hover:-translate-y-1 transition-all shadow-lg shadow-pink-200">
         ¡GUARDAR RECUERDO!
       </button>
     </form>
@@ -131,7 +131,7 @@ function App(){
             
             <button 
               onClick={() => borrarRecuerdo(item.id)}
-              className="w-full py-3 text-red-400 font-bold rounded-xl hover:bg-red-50 hover:text-red-600 transition-all border border-transparent hover:border-red-100"
+              className="w-full py-3 bg-red-50 text-red-500 font-bold rounded-xl border border-red-100 hover:bg-red-500 hover:text-white transition-all duration-300 shadow-sm"
             >
               Eliminar este momento
             </button>
