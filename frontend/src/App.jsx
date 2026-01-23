@@ -12,7 +12,7 @@ function App(){
   })
 
   const traerDatos = async () => {
-    const respuesta = await fetch('https://api-recuerdos-nullvoice.onrender.com/recuerdos')
+    const respuesta = await fetch('https://api-recuerdos-nullvoice.onrender.com/recuerdos')    
     const datos = await respuesta.json()
     setRecuerdos(datos)
   }
@@ -24,27 +24,19 @@ function App(){
 
   const borrarRecuerdo = async (id) => {
     if (!window.confirm("¿Estás seguro de que quieres borrar este recuerdo?")) return;
-
     try {
-       
-        const respuesta = await fetch(`https://api-recuerdos-nullvoice.onrender.com/recuerdos/${id}`, {
+        // CAMBIO: Borra en tu PC
+        const respuesta = await fetch(`https://api-recuerdos-nullvoice.onrender.com/${id}`, {          
             method: 'DELETE',
         });
-
-        if (respuesta.ok) {
-            traerDatos(); 
-        } else {
-            alert("Error al intentar borrar el recuerdo");
-        }
+        if (respuesta.ok) traerDatos(); 
     } catch (error) {
         console.error("Error en la conexión:", error);
     }
-};
+  };
 
   const guardarConFoto = async (e) => {
     e.preventDefault();
-    
-    // Validar que haya un archivo seleccionado
     if (!archivo) {
         alert("Por favor selecciona una foto");
         return;
@@ -57,7 +49,8 @@ function App(){
     formData.append('foto', archivo); 
 
     try {
-        const respuesta = await fetch('https://api-recuerdos-nullvoice.onrender.com/recuerdos-con-foto', {
+        // CAMBIO: Agregamos /recuerdos-con-foto y apuntamos a localhost
+        const respuesta = await fetch('https://api-recuerdos-nullvoice.onrender.com/recuerdos-con-foto', {          
             method: 'POST',
             body: formData,
         });
@@ -66,16 +59,12 @@ function App(){
           setNuevoRecuerdo({ titulo: '', desc: '', palabra: '' });
           document.querySelector('input[type="file"]').value = "";
           setArchivo(null);
-          traerDatos();          
+          traerDatos(); // Esto refrescará la lista local          
         }
     } catch (error) {
         console.error("Error al enviar:", error);
     }
-
-    
-}
-
-
+  }
 
 
   return (
@@ -124,9 +113,10 @@ function App(){
         <div key={index} className="group bg-white rounded-4xl overflow-hidden shadow-xl hover:shadow-pink-200 transition-all duration-500 hover:-translate-y-2 border border-pink-50">
           <div className="relative h-72 overflow-hidden">
             <img 
-              src={`https://api-recuerdos-nullvoice.onrender.com/${item.ruta_foto}`} 
+              src={item.ruta_foto}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               alt={item.titulo}
+              onError={(e) => e.target.src = "https://via.placeholder.com/150"} // Esto pone una imagen de error si falla
             />
             <div className="absolute top-4 left-4">
               <span className="bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-bold text-pink-500 shadow-sm uppercase tracking-widest">

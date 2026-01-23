@@ -1,3 +1,4 @@
+import cloudinary.uploader
 from fastapi import FastAPI, Depends, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -5,9 +6,17 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
-import shutil
+import cloudinary
+from cloudinary.utils import cloudinary_url
 import os
 
+
+cloudinary.config( 
+  cloud_name = "dtbbgw8jx", 
+  api_key = "216869891311618", 
+  api_secret = "qIOlQbPWpfz40X1oeqfGq1wO5z0",
+  secure = True
+)
 
 # 1. Configuración de la Base de Datos
 DATABASE_URL = "sqlite:///./momentos.db"
@@ -49,11 +58,6 @@ def get_db():
     finally:
         db.close()
 
-if not os.path.exists("uploads"):
-    os.makedirs("uploads")
-
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-
 # --- RUTAS ---
 
 @app.get("/recuerdos")
@@ -74,30 +78,39 @@ async def guardar_con_foto(
     titulo: str = Form(...),
     desc: str = Form(...),
     palabra: str = Form(...),
-    foto: UploadFile = File(...),
-    db: Session = Depends(get_db)
+    foto: UploadFile = File(...)
 ):
-    # 1. Definimos la ruta donde se guardará físicamente
-    ruta_archivo = os.path.join("uploads", foto.filename)
     
-    # 2. Guardamos el archivo
-    with open(ruta_archivo, "wb") as buffer:
-        shutil.copyfileobj(foto.file, buffer)
-
-    # 3. GUARDAMOS EN LA DB (Fuera del 'with' para mayor seguridad)
-    # Guardamos 'uploads/nombre.jpg' para que coincida con el app.mount
-    db_recuerdo = RecuerdoDB(
-        titulo = titulo,
-        desc = desc,
-        palabra = palabra,
-        ruta_foto = ruta_archivo  # Esto guardará "uploads/nombre_de_la_foto.jpg"
-    )
+    try: 
+        print(f"Intentando subir foto: {foto.filename}")
         
-    db.add(db_recuerdo)
-    db.commit()
-    db.refresh(db_recuerdo)
-    
-    return {"mensaje": "Foto y recuerdo guardados", "id": db_recuerdo.id}
+        # Subimos el archivo a cloudinary        
+        upload_result = cloudinary.uploader.upload(foto.file)
+        print("Subida exitosa a Cloudinary")
+        
+        # Extraemos la URL segura que nos da cloudinary        
+        url_foto = upload_result['secure_url']
+        print(f"URL generada: {url_foto}")
+
+
+        # 3. GUARDAMOS EN LA DB  la URL, no la ruta local
+        db = SessionLocal()
+        nuevo_recuerdo = RecuerdoDB (
+            titulo=titulo, 
+            desc=desc, 
+            palabra=palabra, 
+            ruta_foto=url_foto 
+        )
+        db.add(nuevo_recuerdo)
+        db.commit()
+        db.refresh(nuevo_recuerdo)
+        db.close()
+
+        return {"status": "Succes", "url": url_foto}
+    except Exception as e:
+        print(f"ERROR CRITICO: {e}")
+        return {"status": "error", "message": str(e)}
+
 
 @app.delete("/recuerdos/{recuerdo_id}")
 def borrar_recuerdo(recuerdo_id: int, db: Session = Depends(get_db)):
