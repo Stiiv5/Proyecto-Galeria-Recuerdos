@@ -19,7 +19,7 @@ cloudinary.config(
 )
 
 # 1. Configuración de la Base de Datos
-DATABASE_URL = "sqlite:///./momentos.db"
+DATABASE_URL = "postgresql://db_recuerdos_user:IfmlFq5IsBRcKHLohglRDBMxmBHvQwC7@dpg-d5pdi814tr6s73aplskg-a/db_recuerdos"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
