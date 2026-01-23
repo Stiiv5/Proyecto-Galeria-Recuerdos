@@ -131,7 +131,7 @@ function App(){
             
             <button 
               onClick={() => borrarRecuerdo(item.id)}
-              className="w-full py-3 bg-red-50 text-red-500 font-bold rounded-xl border border-red-100 hover:bg-red-500 hover:text-white transition-all duration-300 shadow-sm"
+              className="w-full py-3 bg-white text-gray-600 font-bold rounded-xl border-2 border-gray-100 hover:border-red-400 hover:text-red-500 transition-all duration-300"
             >
               Eliminar este momento
             </button>
